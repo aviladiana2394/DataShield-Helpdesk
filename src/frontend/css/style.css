@@ -1,0 +1,244 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+h1 {
+    font-size: 28px;
+    color: #1a2c3e;
+    border-left: 5px solid #007bff;
+    padding-left: 15px;
+    margin-bottom: 25px;
+}
+
+h2, h3 {
+    color: #2c3e50;
+    margin: 20px 0 10px 0;
+}
+
+hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+/* Estilos comunes para inputs, selects, textarea y botones */
+input, select, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+button:hover {
+    background: #0056b3;
+    transform: scale(1.01);
+}
+
+/* Botón secundario (Registrarse, Volver al login) */
+.secondary-btn {
+    background: #6c757d;
+    margin-top: 10px;
+}
+.secondary-btn:hover {
+    background: #5a6268;
+}
+
+#logout-btn {
+    background: #dc3545;
+    width: auto;
+    padding: 8px 16px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+#logout-btn:hover {
+    background: #b02a37;
+}
+
+/* DISEÑO DE DOS COLUMNAS */
+.two-columns {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.tickets-list-container {
+    flex: 2;
+    min-width: 250px;
+}
+
+.create-ticket-container {
+    flex: 1;
+    min-width: 250px;
+    background: #f9fafc;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Lista de tickets */
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+li {
+    background: #f8f9fa;
+    border-left: 5px solid #007bff;
+    margin: 12px 0;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: 0.1s;
+}
+
+li:hover {
+    background: #eef2f7;
+}
+
+/* Colores según estado del ticket */
+li.estado-abierto { border-left-color: #28a745; }
+li.estado-en-proceso { border-left-color: #ffc107; }
+li.estado-resuelto { border-left-color: #17a2b8; }
+li.estado-cerrado { border-left-color: #6c757d; }
+
+li strong {
+    color: #1e466e;
+    font-size: 16px;
+}
+
+small {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.success {
+    color: #28a745;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+#login-message, #create-message {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.auth-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Responsive: en móviles las columnas se apilan */
+@media (max-width: 768px) {
+    .two-columns {
+        flex-direction: column;
+    }
+    .container {
+        padding: 20px;
+    }
+    h1 {
+        font-size: 22px;
+    }
+    button, input, select, textarea {
+        font-size: 16px;
+    }
+}
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover {
+    color: black;
+}
+.edit-btn {
+    background-color: #ffc107;
+    color: #1a2c3e;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+}
+.edit-btn:hover {
+    background-color: #e0a800;
+}

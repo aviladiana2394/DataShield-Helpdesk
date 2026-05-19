@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataShield - Help Desk</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>DataShield - Centro de Incidentes</h1>
+
+        <!-- Sección de autenticación (login y registro) -->
+        <div id="auth-section">
+            <!-- Formulario de login (visible por defecto) -->
+            <div id="login-form" class="auth-form">
+                <h2>Login</h2>
+                <input type="email" id="login-email" placeholder="Correo">
+                <input type="password" id="login-password" placeholder="Contraseña">
+                <button id="login-btn">Iniciar sesión</button>
+                <div id="login-message"></div>
+                <!-- Botón para mostrar registro -->
+                <button id="show-register-btn" class="secondary-btn">Registrarse</button>
+            </div>
+
+            <!-- Formulario de registro (oculto al inicio) -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <h2>Registro</h2>
+                <input type="text" id="register-nombre" placeholder="Nombre completo">
+                <input type="email" id="register-email" placeholder="Correo">
+                <input type="password" id="register-password" placeholder="Contraseña (mínimo 6 caracteres)">
+                <select id="register-rol">
+                    <option value="usuario">Usuario</option>
+                    <option value="tecnico">Técnico</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                <button id="register-btn">Registrarse</button>
+                <div id="register-message"></div>
+                <!-- Botón para volver al login -->
+                <button id="back-to-login-btn" class="secondary-btn">Volver al login</button>
+            </div>
+        </div>
+
+        <!-- Sección de tickets (visible solo después del login) -->
+        <div id="tickets-section" style="display:none;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Panel de Incidentes</h2>
+                <button id="logout-btn">Cerrar sesión</button>
+            </div>
+            <hr>
+
+            <div class="two-columns">
+                <div class="tickets-list-container">
+                    <h3>Tickets existentes</h3>
+                    <div id="tickets-list"></div>
+                </div>
+                <div class="create-ticket-container">
+                    <h3>Crear nuevo ticket</h3>
+                    <input type="text" id="titulo" placeholder="Título (mínimo 5 caracteres)">
+                    <textarea id="descripcion" placeholder="Descripción (mínimo 10 caracteres)"></textarea>
+                    <select id="categoria">
+                        <option value="phishing">Phishing</option>
+                        <option value="malware">Malware</option>
+                        <option value="acceso_no_autorizado">Acceso no autorizado</option>
+                        <option value="vulnerabilidad">Vulnerabilidad</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <select id="prioridad">
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="critica">Crítica</option>
+                    </select>
+                    <button id="create-ticket-btn">Crear Ticket</button>
+                    <div id="create-message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
