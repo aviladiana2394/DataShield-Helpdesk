@@ -5,17 +5,17 @@ const cors = require('cors');
 app.use(cors());
 
 // middlewares
-const logger = require('./middleware/logger');
-const errorHandler = require('./middleware/errorHandler');
+const logger = require('./src/middleware/logger');
+const errorHandler = require('./src/middleware/errorHandler');
 
 // rutas
-const ticketsRoutes = require('./routes/tickets.routes');
-const authRoutes = require('./routes/auth.routes'); // <-- corregido
-const usersRoutes = require('./routes/users.routes');
+const ticketsRoutes = require('./src/routes/tickets.routes');
+const authRoutes = require('./src/routes/auth.routes');
+const usersRoutes = require('./src/routes/users.routes');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
-const knowledgeRoutes = require('./routes/knowledgeRoutes');   
-const dashboardRoutes = require('./routes/dashboardRoutes');   
+const swaggerSpec = require('./src/config/swagger');
+const knowledgeRoutes = require('./src/routes/knowledgeRoutes');   
+const dashboardRoutes = require('./src/routes/dashboardRoutes');   
 
 app.use(express.json());
 app.use(logger);

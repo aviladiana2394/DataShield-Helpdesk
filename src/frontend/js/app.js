@@ -1,5 +1,3 @@
-// app.js - DataShield Frontend (con visualización de detalles)
-//const API_URL = 'http://localhost:3000';
 const API_URL = 'https://datashield-backend.onrender.com'; 
 
 // ==================== DECODIFICAR TOKEN ====================
