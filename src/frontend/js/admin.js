@@ -1,5 +1,6 @@
 // admin.js - Panel Administrativo DataShield
 const API_URL = 'http://localhost:3000';
+const API_URL = 'https://datashield-backend.onrender.com'; 
 let token = localStorage.getItem('token');
 let ticketsCache = []; // Guardar todos los tickets para filtrar
 let paginaActual = 1;
