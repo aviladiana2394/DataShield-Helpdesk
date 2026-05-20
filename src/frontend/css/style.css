@@ -432,6 +432,7 @@ small {
     color: white;
 }
 
+
 .prioridad-baja { background-color: #28a745; }
 .prioridad-media { background-color: #ffc107; color: #333; }
 .prioridad-alta { background-color: #fd7e14; }
