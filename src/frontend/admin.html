@@ -4,18 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataShield - Panel Administrativo</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-container">
-        <h1>Panel Administrativo</h1>
+        <!-- HEADER CON LOGO Y TÍTULO -->
+        <div class="admin-header">
+            <div class="logo-titulo">
+                <img src="logo.png" alt="DataShield Logo" class="logo-img">
+                <h1>DataShield</h1>
+            </div>
+            <div>
+                <a href="index.html" class="btn-back">Volver al inicio</a>
+                <button id="logout-admin" class="btn-logout">Cerrar sesión</button>
+            </div>
+        </div>
+        
         <div class="menu">
             <button id="btn-tickets" class="menu-btn active">Tickets</button>
             <button id="btn-usuarios" class="menu-btn">Usuarios</button>
         </div>
         <div id="contenido" class="contenido">
-          <p>Selecciona una opción</p>
+            <p>Selecciona una opción</p>
         </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>DataShield v1.0 | Centro de Gestión de Incidentes de Ciberseguridad</p>
+        </footer>
     </div>
     <script src="js/admin.js"></script>
 </body>

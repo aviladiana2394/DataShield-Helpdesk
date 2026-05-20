@@ -1,4 +1,4 @@
-// app.js - DataShield Frontend (con edición de tickets por roles)
+// app.js - DataShield Frontend (con visualización de detalles)
 const API_URL = 'http://localhost:3000';
 
 // ==================== DECODIFICAR TOKEN ====================
@@ -7,9 +7,30 @@ function getRoleFromToken() {
     if (!token) return null;
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.rol; // el backend guarda el rol como 'rol'
+        return payload.rol;
     } catch (e) {
         return null;
+    }
+}
+
+// Mostrar/ocultar botón de panel admin según rol
+function checkAdminAccess() {
+    const token = localStorage.getItem('token');
+    const adminBtn = document.getElementById('admin-panel-btn');
+    if (!adminBtn) return;
+    if (!token) {
+        adminBtn.style.display = 'none';
+        return;
+    }
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.rol === 'admin' || payload.rol === 'tecnico') {
+            adminBtn.style.display = 'inline-block';
+        } else {
+            adminBtn.style.display = 'none';
+        }
+    } catch(e) {
+        adminBtn.style.display = 'none';
     }
 }
 
@@ -125,6 +146,7 @@ loginBtn.addEventListener('click', async () => {
         showMessage(loginMessage, 'Login exitoso', 'success');
         authSection.style.display = 'none';
         ticketsSection.style.display = 'block';
+        checkAdminAccess();
         fetchTickets(data.token);
     } catch (error) {
         showMessage(loginMessage, error.message, 'error');
@@ -155,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (token) {
         authSection.style.display = 'none';
         ticketsSection.style.display = 'block';
+        checkAdminAccess();
         fetchTickets(token);
     } else {
         authSection.style.display = 'block';
@@ -164,14 +187,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ==================== RENDERIZADO DE TICKETS CON BOTÓN EDITAR ====================
+// ==================== MODAL DE DETALLES (SOLO VISUALIZACIÓN) ====================
+function mostrarDetallesTicket(ticket) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Detalles del Ticket #${ticket.id_ticket}</h3>
+            <div class="detalle-campo">
+                <strong>Título:</strong> ${escapeHtml(ticket.titulo)}
+            </div>
+            <div class="detalle-campo">
+                <strong>Descripción:</strong><br>
+                ${escapeHtml(ticket.descripcion)}
+            </div>
+            <div class="detalle-campo">
+                <strong>Estado:</strong> 
+                <span class="estado-badge estado-${ticket.estado}">${ticket.estado}</span>
+            </div>
+            <div class="detalle-campo">
+                <strong>Prioridad:</strong> 
+                <span class="prioridad-badge prioridad-${ticket.prioridad}">${ticket.prioridad}</span>
+            </div>
+            <div class="detalle-campo">
+                <strong>Categoría:</strong> ${ticket.categoria || 'No especificada'}
+            </div>
+            <div class="detalle-campo">
+                <strong>Creado por:</strong> ${ticket.creador_nombre || ticket.usuario_id}
+            </div>
+            <div class="detalle-campo">
+                <strong>Fecha de creación:</strong> ${new Date(ticket.fecha_creacion).toLocaleString()}
+            </div>
+            <div class="detalle-campo">
+                <strong>Última actualización:</strong> ${new Date(ticket.fecha_actualizacion).toLocaleString()}
+            </div>
+            <button id="cerrar-modal" class="btn-cerrar-modal">Cerrar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+
+    modal.querySelector('.close').onclick = () => modal.remove();
+    modal.querySelector('#cerrar-modal').onclick = () => modal.remove();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ==================== RENDERIZADO DE TICKETS CON BOTÓN "VER DETALLES" ====================
 function renderTickets(tickets) {
     if (!tickets.length) {
         ticketsList.innerHTML = '<p>No hay tickets disponibles.</p>';
         return;
     }
-    const userRole = getRoleFromToken();
-    const canEdit = userRole === 'tecnico' || userRole === 'admin';
 
     const ul = document.createElement('ul');
     tickets.forEach(ticket => {
@@ -181,128 +257,33 @@ function renderTickets(tickets) {
         li.innerHTML = `
             <strong>#${ticket.id_ticket}</strong> - ${ticket.titulo} (${ticket.estado})<br>
             <small>Creado por: ${ticket.creador_nombre || ticket.usuario_id} | 
-            Prioridad: ${ticket.prioridad} | Categoría: ${ticket.categoria}</small>
+            Prioridad: ${ticket.prioridad} | Categoría: ${ticket.categoria}<br>
+            Fecha: ${new Date(ticket.fecha_creacion).toLocaleString()}</small>
         `;
-        if (canEdit) {
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'Editar';
-            editBtn.className = 'edit-btn';
-            editBtn.style.marginTop = '8px';
-            editBtn.style.width = 'auto';
-            editBtn.style.padding = '6px 12px';
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showEditModal(ticket);
-            });
-            li.appendChild(editBtn);
-        }
+        
+        // Botón para ver detalles
+        const detalleBtn = document.createElement('button');
+        detalleBtn.textContent = 'Ver detalles';
+        detalleBtn.className = 'detalle-btn';
+        detalleBtn.style.marginTop = '8px';
+        detalleBtn.style.width = 'auto';
+        detalleBtn.style.padding = '6px 12px';
+        detalleBtn.style.backgroundColor = '#17a2b8';
+        detalleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mostrarDetallesTicket(ticket);
+        });
+        li.appendChild(detalleBtn);
+        
         ul.appendChild(li);
     });
     ticketsList.innerHTML = '';
     ticketsList.appendChild(ul);
 }
 
-// Edicion para tickets (admin y tecnico)
-function escapeHtml(str) {
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
-
-function showEditModal(ticket) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Editar Ticket #${ticket.id_ticket}</h3>
-            <label>Título:</label>
-            <input type="text" id="edit-titulo" value="${escapeHtml(ticket.titulo)}">
-            <label>Descripción:</label>
-            <textarea id="edit-descripcion">${escapeHtml(ticket.descripcion)}</textarea>
-            <label>Estado:</label>
-            <select id="edit-estado">
-                <option value="abierto" ${ticket.estado === 'abierto' ? 'selected' : ''}>Abierto</option>
-                <option value="en_proceso" ${ticket.estado === 'en_proceso' ? 'selected' : ''}>En proceso</option>
-                <option value="resuelto" ${ticket.estado === 'resuelto' ? 'selected' : ''}>Resuelto</option>
-                <option value="cerrado" ${ticket.estado === 'cerrado' ? 'selected' : ''}>Cerrado</option>
-            </select>
-            <label>Prioridad:</label>
-            <select id="edit-prioridad">
-                <option value="baja" ${ticket.prioridad === 'baja' ? 'selected' : ''}>Baja</option>
-                <option value="media" ${ticket.prioridad === 'media' ? 'selected' : ''}>Media</option>
-                <option value="alta" ${ticket.prioridad === 'alta' ? 'selected' : ''}>Alta</option>
-                <option value="critica" ${ticket.prioridad === 'critica' ? 'selected' : ''}>Crítica</option>
-            </select>
-            <label>Categoría:</label>
-            <select id="edit-categoria">
-                <option value="phishing" ${ticket.categoria === 'phishing' ? 'selected' : ''}>Phishing</option>
-                <option value="malware" ${ticket.categoria === 'malware' ? 'selected' : ''}>Malware</option>
-                <option value="acceso_no_autorizado" ${ticket.categoria === 'acceso_no_autorizado' ? 'selected' : ''}>Acceso no autorizado</option>
-                <option value="vulnerabilidad" ${ticket.categoria === 'vulnerabilidad' ? 'selected' : ''}>Vulnerabilidad</option>
-                <option value="otro" ${ticket.categoria === 'otro' ? 'selected' : ''}>Otro</option>
-            </select>
-            <button id="save-edit-btn">Guardar cambios</button>
-            <div id="edit-message"></div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.style.display = 'block';
-
-    const closeBtn = modal.querySelector('.close');
-    closeBtn.onclick = () => modal.remove();
-
-    const saveBtn = modal.querySelector('#save-edit-btn');
-    const editMessage = modal.querySelector('#edit-message');
-    saveBtn.onclick = async () => {
-        const updatedData = {
-            titulo: modal.querySelector('#edit-titulo').value.trim(),
-            descripcion: modal.querySelector('#edit-descripcion').value.trim(),
-            estado: modal.querySelector('#edit-estado').value,
-            prioridad: modal.querySelector('#edit-prioridad').value,
-            categoria: modal.querySelector('#edit-categoria').value
-        };
-        if (updatedData.titulo.length < 5) {
-            editMessage.textContent = 'El título debe tener al menos 5 caracteres.';
-            editMessage.classList.add('error');
-            return;
-        }
-        if (updatedData.descripcion.length < 10) {
-            editMessage.textContent = 'La descripción debe tener al menos 10 caracteres.';
-            editMessage.classList.add('error');
-            return;
-        }
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_URL}/tickets/${ticket.id_ticket}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(updatedData)
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Error al actualizar');
-            editMessage.textContent = 'Ticket actualizado correctamente';
-            editMessage.classList.add('success');
-            setTimeout(() => {
-                modal.remove();
-                fetchTickets(token);
-            }, 1000);
-        } catch (error) {
-            editMessage.textContent = error.message;
-            editMessage.classList.add('error');
-        }
-    };
-}
-
 // Obtener y mostrar tickets (con manejo de 401)
 async function fetchTickets(token) {
-    ticketsList.innerHTML = 'Cargando tickets...';
+    ticketsList.innerHTML = '<div class="spinner"></div>';
     try {
         const response = await fetch(`${API_URL}/tickets`, {
             headers: { 'Authorization': `Bearer ${token}` }

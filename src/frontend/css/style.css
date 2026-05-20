@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
     padding: 20px;
     min-height: 100vh;
     display: flex;
@@ -22,6 +22,18 @@ body {
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     padding: 30px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h1 {
@@ -72,11 +84,13 @@ button {
     font-weight: bold;
     cursor: pointer;
     margin-top: 12px;
+    transition: all 0.2s ease;
 }
 
 button:hover {
     background: #0056b3;
-    transform: scale(1.01);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
 }
 
 /* Botón secundario (Registrarse, Volver al login) */
@@ -95,7 +109,6 @@ button:hover {
     margin-bottom: 20px;
     display: inline-block;
 }
-
 #logout-btn:hover {
     background: #b02a37;
 }
@@ -136,11 +149,11 @@ li {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: 0.1s;
+    transition: all 0.2s ease;
 }
-
 li:hover {
     background: #eef2f7;
+    transform: translateX(5px);
 }
 
 /* Colores según estado del ticket */
@@ -181,6 +194,7 @@ small {
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    animation: fadeInUp 0.4s ease-out;
 }
 
 /* Responsive: en móviles las columnas se apilan */
@@ -198,6 +212,7 @@ small {
         font-size: 16px;
     }
 }
+
 /* MODAL */
 .modal {
     display: none;
@@ -209,6 +224,11 @@ small {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 .modal-content {
     background-color: #fefefe;
@@ -218,6 +238,17 @@ small {
     width: 90%;
     max-width: 500px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease;
+}
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 .close {
     color: #aaa;
@@ -241,4 +272,196 @@ small {
 }
 .edit-btn:hover {
     background-color: #e0a800;
+}
+
+/* HEADER PRINCIPAL CON LOGO */
+.main-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.logo-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.15));
+    transition: transform 0.3s ease;
+}
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.logo-titulo h1 {
+    font-size: 42px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1a2c3e 0%, #007bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.slogan {
+    font-size: 14px;
+    color: #6c757d;
+    letter-spacing: 1px;
+    margin-top: 5px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 12px;
+}
+
+/* Responsive para móvil */
+@media (max-width: 600px) {
+    .logo-titulo h1 {
+        font-size: 28px;
+    }
+    .logo-img {
+        width: 45px;
+        height: 45px;
+    }
+    .slogan {
+        font-size: 11px;
+    }
+}
+/* Botón para ir al panel administrativo */
+.admin-link {
+    background: #17a2b8;
+    color: white;
+    text-decoration: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-right: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.admin-link:hover {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+}
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* Modal de detalles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 550px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover {
+    color: black;
+}
+
+.detalle-campo {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.detalle-campo strong {
+    display: inline-block;
+    width: 130px;
+    color: #1a2c3e;
+}
+
+.estado-badge, .prioridad-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.prioridad-baja { background-color: #28a745; }
+.prioridad-media { background-color: #ffc107; color: #333; }
+.prioridad-alta { background-color: #fd7e14; }
+.prioridad-critica { background-color: #dc3545; }
+
+.btn-cerrar-modal {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 100%;
+}
+.btn-cerrar-modal:hover {
+    background: #0056b3;
+}
+
+.detalle-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+.detalle-btn:hover {
+    background-color: #138496;
+    transform: translateY(-2px);
 }

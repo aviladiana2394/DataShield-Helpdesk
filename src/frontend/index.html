@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataShield - Help Desk</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>DataShield - Centro de Incidentes</h1>
+        <!-- HEADER CON LOGO Y TÍTULO -->
+        <div class="main-header">
+            <div class="logo-titulo">
+                <img src="logo.png" alt="DataShield Logo" class="logo-img">
+                <h1>DataShield</h1>
+            </div>
+            <p class="slogan">Centro de Gestión de Incidentes de Ciberseguridad</p>
+        </div>
 
         <!-- Sección de autenticación (login y registro) -->
         <div id="auth-section">
@@ -45,7 +53,10 @@
         <div id="tickets-section" style="display:none;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2>Panel de Incidentes</h2>
-                <button id="logout-btn">Cerrar sesión</button>
+                <div>
+                    <a href="admin.html" id="admin-panel-btn" class="admin-link" style="display: none; margin-right: 10px;">Panel Administrativo</a>
+                    <button id="logout-btn">Cerrar sesión</button>
+                </div>
             </div>
             <hr>
 
@@ -76,6 +87,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>DataShield v1.0 | Centro de Gestión de Incidentes de Ciberseguridad</p>
+        </footer>
     </div>
     <script src="js/app.js"></script>
 </body>
