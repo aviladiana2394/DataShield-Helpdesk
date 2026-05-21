@@ -2,72 +2,118 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 app.use(cors());
-
-console.log('📁 Iniciando carga de middlewares...');
-
-// middlewares
-const logger = require('./middleware/logger');
-const errorHandler = require('./middleware/errorHandler');
-
-console.log('✅ Middlewares cargados correctamente');
-console.log('📁 Iniciando carga de rutas...');
-
-// rutas
-const ticketsRoutes = require('./routes/tickets.routes');
-const authRoutes = require('./routes/auth.routes');
-const usersRoutes = require('./routes/users.routes');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
-const knowledgeRoutes = require('./routes/knowledgeRoutes');   
-const dashboardRoutes = require('./routes/dashboardRoutes');   
-
-console.log('✅ Rutas cargadas correctamente');
-
 app.use(express.json());
-app.use(logger);
 
-// Swagger docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Importar la conexión a la base de datos
+const { query } = require('./config/db');
 
-// ruta de prueba
+// Ruta de prueba
 app.get('/', (req, res) => {
-  console.log('📍 Ruta raíz consultada');
-  res.send('Help Center API funcionando');
+    res.send('Help Center API funcionando');
 });
 
-console.log('📁 Montando rutas principales...');
+// Ruta de registro (POST /users/register)
+app.post('/users/register', async (req, res) => {
+    try {
+        const { nombre, email, password, rol } = req.body;
+        if (!nombre || !email || !password) {
+            return res.status(400).json({ error: 'Faltan campos obligatorios' });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const sql = 'INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)';
+        await query(sql, [nombre, email, hashedPassword, rol || 'usuario']);
+        res.status(201).json({ message: 'Usuario registrado correctamente' });
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'El correo electrónico ya está registrado' });
+        }
+        res.status(500).json({ error: 'Error interno al registrar usuario' });
+    }
+});
 
-// rutas principales
-app.use('/auth', authRoutes);
-app.use('/tickets', ticketsRoutes);
-app.use('/users', usersRoutes);
-app.use('/knowledge', knowledgeRoutes);  
-app.use('/dashboard', dashboardRoutes);
+// Ruta de login (POST /auth/login)
+app.post('/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const sql = 'SELECT * FROM usuarios WHERE email = ?';
+        const results = await query(sql, [email]);
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+        const usuario = results[0];
+        const passwordValida = await bcrypt.compare(password, usuario.password);
+        if (!passwordValida) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+        const token = jwt.sign(
+            { id: usuario.id_usuario, rol: usuario.rol },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        res.json({ message: 'Login exitoso', token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error interno al iniciar sesión' });
+    }
+});
 
-console.log('✅ Rutas principales montadas:');
-console.log('   - /auth');
-console.log('   - /tickets');
-console.log('   - /users');
-console.log('   - /knowledge');
-console.log('   - /dashboard');
+// Ruta para obtener tickets (GET /tickets) - solo técnico/admin
+app.get('/tickets', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ error: 'Token requerido' });
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        if (payload.rol !== 'tecnico' && payload.rol !== 'admin') {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+        const tickets = await query(`
+            SELECT t.*, u.nombre as creador_nombre, tec.nombre as tecnico_nombre
+            FROM tickets t
+            LEFT JOIN usuarios u ON t.usuario_id = u.id_usuario
+            LEFT JOIN usuarios tec ON t.tecnico_id = tec.id_usuario
+        `);
+        res.json({ success: true, data: tickets });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
-// manejo de rutas inexistentes
+// Ruta para crear tickets (POST /tickets)
+app.post('/tickets', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) return res.status(401).json({ error: 'Token requerido' });
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        const { titulo, descripcion, categoria, prioridad } = req.body;
+        if (!titulo || !descripcion) {
+            return res.status(400).json({ error: 'Título y descripción obligatorios' });
+        }
+        const sql = `INSERT INTO tickets (titulo, descripcion, categoria, prioridad, estado, usuario_id)
+                     VALUES (?, ?, ?, ?, 'abierto', ?)`;
+        const result = await query(sql, [titulo, descripcion, categoria || 'otro', prioridad || 'media', payload.id]);
+        res.status(201).json({ success: true, data: { id: result.insertId } });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Manejo de rutas no encontradas
 app.use((req, res) => {
-  console.log(`❌ Ruta no encontrada: ${req.method} ${req.url}`);
-  res.status(404).json({
-    success: false,
-    message: 'Ruta no encontrada'
-  });
+    res.status(404).json({ success: false, message: 'Ruta no encontrada' });
 });
 
-// middleware global de errores
-app.use(errorHandler);
+// Middleware global de errores
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+});
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-  console.log(`📡 API disponible en: http://localhost:${PORT}`);
-  console.log(`📚 Swagger UI en: http://localhost:${PORT}/api-docs`);
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });

@@ -1,4 +1,4 @@
-const API_URL = 'https://datashield-backend.onrender.com'; 
+const API_URL = process.env.API_URL || 'https://datashield-backend.onrender.com';
 
 // ==================== DECODIFICAR TOKEN ====================
 function getRoleFromToken() {

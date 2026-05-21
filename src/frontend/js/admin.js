@@ -1,4 +1,4 @@
-const API_URL = 'https://datashield-backend.onrender.com'; 
+const API_URL = process.env.API_URL || 'https://datashield-backend.onrender.com';
 let token = localStorage.getItem('token');
 let ticketsCache = []; // Guardar todos los tickets para filtrar
 let paginaActual = 1;
